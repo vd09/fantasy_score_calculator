@@ -1,0 +1,26 @@
+package player
+
+const (
+	// Batting Scores
+	DUCK_BONUS          = -2
+	THIRTY_RUN_BONUS    = 4
+	HALF_CENTURY_BONUS  = 8
+	CENTURY_BONUS       = 16
+	FOUR_BOUNDARY_BONUS = 1
+	SIX_BOUNDARY_BONUS  = FOUR_BOUNDARY_BONUS + 2
+
+	// Bowler Scores
+	WICKET_SCORE       = 25
+	LBW_BONUS          = 8
+	THREE_WICKET_BONUS = 4
+	FOUR_WICKET_BONUS  = 8
+	FIVE_WICKET_BONUS  = 16
+	MAIDEN_OVER_SCORE  = 12
+
+	// Field Scores
+	CATCH_SCORE         = 8
+	BONUS_THREE_CATCH   = 4
+	STUMP_SCORE         = 12
+	RUNOUT_DIRECT_HIT   = 12
+	RUNOUT_INDIRECT_HIT = 6
+)
