@@ -1,27 +1,27 @@
 package player
 
 type BowlingStats struct {
-	Runs        int
-	DotBalls    int
-	Wickets     int
-	LbwWickets  int
-	MaidenOvers int
-	Overs       float64
+	Runs        int     `csv:"runs"`
+	DotBalls    int     `csv:"dot_balls"`
+	Wickets     int     `csv:"wickets"`
+	LbwWickets  int     `csv:"lbw_wickets"`
+	MaidenOvers int     `csv:"maiden_overs"`
+	Overs       float64 `csv:"overs"`
 }
 
-func (bw BowlingStats) GetBowlingScore() int {
+func (bw *BowlingStats) GetBowlingScore() int {
 	return bw.getWicketScore() + bw.getLbwBonusScore() + bw.getMaidenScore() + bw.getEconomyRateScore()
 }
 
-func (bw BowlingStats) getWicketScore() int {
+func (bw *BowlingStats) getWicketScore() int {
 	return (bw.Wickets * WICKET_SCORE) + bw.getWicketBonus()
 }
 
-func (bw BowlingStats) getLbwBonusScore() int {
+func (bw *BowlingStats) getLbwBonusScore() int {
 	return bw.LbwWickets * LBW_BONUS
 }
 
-func (bw BowlingStats) getWicketBonus() int {
+func (bw *BowlingStats) getWicketBonus() int {
 	switch {
 	case bw.Wickets >= 5:
 		return FIVE_WICKET_BONUS
@@ -34,11 +34,11 @@ func (bw BowlingStats) getWicketBonus() int {
 	}
 }
 
-func (bw BowlingStats) getMaidenScore() int {
+func (bw *BowlingStats) getMaidenScore() int {
 	return bw.MaidenOvers * MAIDEN_OVER_SCORE
 }
 
-func (bw BowlingStats) getEconomyRateScore() int {
+func (bw *BowlingStats) getEconomyRateScore() int {
 	if bw.Overs < 2 {
 		return 0
 	}
@@ -62,7 +62,7 @@ func (bw BowlingStats) getEconomyRateScore() int {
 	}
 }
 
-func (bw BowlingStats) getEconomyRate() float64 {
+func (bw *BowlingStats) getEconomyRate() float64 {
 	lastFullOver := float64(int(bw.Overs))
 	balls := (bw.Overs - lastFullOver) * 10
 	adjustedOver := lastFullOver + (balls / 6)

@@ -1,49 +1,29 @@
 package match
 
 import (
-	"fantasy_score_calculator/domain"
 	"fantasy_score_calculator/player"
+	"strings"
 )
 
 type Match struct {
-	id                        string
-	name                      string
-	roleToNameMap             map[player.PlayerRole]string
-	playerMap                 map[string]player.Player
+	Id                        string
+	roleToNamesMap            map[player.PlayerRole][]string
+	MatchPlayerMap            map[string]*player.MatchPlayer
 	playerNameToFieldingStats map[string]*player.FieldingStats
 	playerNameToLbwWickets    map[string]int
 }
 
-func (m *Match) AddPlayer(data domain.MatchPlayerData) {
-	m.playerMap[data.Name] = player.Player{
-		Name:          data.Name,
-		NameWithTitle: data.NameWDTitles,
-		PlayerRole:    player.ALL_ROUNDER,
-		BattingStats:  m.CreateBattingStatsForPlayer(data),
-		BowlingStats:  m.CreateBowlingStatsForPlayer(data),
-	}
-	m.UpdateFieldingStats(data.OutDetails)
-}
-
-func (m *Match) CreateBattingStatsForPlayer(data domain.MatchPlayerData) player.BattingStats {
-	return player.BattingStats{
-		Runs:        data.RunsAsBatter,
-		TotalFours:  data.FoursAsBatter,
-		TotalSixes:  data.SixesAsBatter,
-		PlayedBalls: data.BallsAsBatter,
-		OutDetails:  data.OutDetails,
+func (m *Match) UpdateScores() {
+	for name, pl := range m.MatchPlayerMap {
+		pl.PlayerStats.FieldingStats = m.getFieldingStatsFromPlayerName(name)
+		pl.PlayerStats.BowlingStats.LbwWickets = m.getLbwWicketsFromPlayerName(name)
+		pl.PlayerStats.CalculatePlayerScore()
 	}
 }
 
-func (m *Match) CreateBowlingStatsForPlayer(data domain.MatchPlayerData) player.BowlingStats {
-	return player.BowlingStats{
-		Runs:        data.RunsAsBowler,
-		DotBalls:    data.DotBallsAsBowler,
-		Wickets:     data.WicketAsBowler,
-		LbwWickets:  0,
-		MaidenOvers: 0,
-		Overs:       data.OversAsBowler,
-	}
+func (m *Match) AddPlayer(data *player.MatchPlayer) {
+	m.MatchPlayerMap[data.PlayerStats.Name] = data
+	m.UpdateFieldingStats(data.PlayerStats.BattingStats.OutDetails)
 }
 
 func (m *Match) UpdateFieldingStats(outDetails string) {
@@ -68,23 +48,37 @@ func (m *Match) UpdateFieldingStats(outDetails string) {
 }
 
 func (m *Match) getFieldingStatsFromPlayerName(playerName string) *player.FieldingStats {
-	if _, ok := m.playerNameToFieldingStats[playerName]; !ok {
-		m.playerNameToFieldingStats[playerName] = &player.FieldingStats{}
+	playerNameKey := m.getKeyFromPlayerName(playerName)
+	if _, ok := m.playerNameToFieldingStats[playerNameKey]; !ok {
+		m.playerNameToFieldingStats[playerNameKey] = &player.FieldingStats{}
 	}
-	return m.playerNameToFieldingStats[playerName]
+	return m.playerNameToFieldingStats[playerNameKey]
 }
 
-func NewMatchWithFirstPlayer(data domain.MatchPlayerData) *Match {
-	matchDetails := NewMatchDetails(data.MatchID, data.MatchName)
+func (m *Match) getLbwWicketsFromPlayerName(playerName string) int {
+	playerNameKey := m.getKeyFromPlayerName(playerName)
+	if _, ok := m.playerNameToLbwWickets[playerNameKey]; !ok {
+		m.playerNameToLbwWickets[playerNameKey] = 0
+	}
+	return m.playerNameToLbwWickets[playerNameKey]
+}
+
+func (m *Match) getKeyFromPlayerName(name string) string {
+	name = strings.ReplaceAll(name, " ", "")
+	return strings.ToUpper(name)
+	//return name
+}
+
+func NewMatchWithFirstPlayer(data *player.MatchPlayer) *Match {
+	matchDetails := NewMatch(data)
 	matchDetails.AddPlayer(data)
 	return matchDetails
 }
 
-func NewMatchDetails(matchId, matchName string) *Match {
+func NewMatch(matchPlayerData *player.MatchPlayer) *Match {
 	return &Match{
-		id:                        matchId,
-		name:                      matchName,
-		playerMap:                 make(map[string]player.Player),
+		Id:                        matchPlayerData.MatchID,
+		MatchPlayerMap:            make(map[string]*player.MatchPlayer),
 		playerNameToFieldingStats: make(map[string]*player.FieldingStats),
 		playerNameToLbwWickets:    make(map[string]int),
 	}

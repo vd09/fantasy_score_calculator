@@ -1,65 +1,110 @@
 package main
 
 import (
-	"fantasy_score_calculator/csv_reader"
-	"fantasy_score_calculator/domain"
+	"context"
+	"errors"
+	"fantasy_score_calculator/match"
+	"fantasy_score_calculator/player"
 	"fmt"
-	"strconv"
+	"sync"
 
-	gr_variable "github.com/vd09/gr-variable"
+	"github.com/vd09/csvutils"
+	"github.com/vd09/gr_worker/worker_pool"
 )
 
-func handleRecord(matchIdToChannel map[string]gr_variable.GrChannel[domain.MatchPlayerData]) csv_reader.RecordHandler {
-	return func(record []string, columnIndex map[string]int) error {
-		foursAsBatter, _ := strconv.Atoi(record[columnIndex["4s-as-batter"]])
-		sixesAsBatter, _ := strconv.Atoi(record[columnIndex["6s-as-batter"]])
-		ballsAsBatter, _ := strconv.Atoi(record[columnIndex["balls-as-batter"]])
-		dotBallsAsBowler, _ := strconv.Atoi(record[columnIndex["dotballs-as-bowler"]])
-		oversAsBowler, _ := strconv.ParseFloat(record[columnIndex["overs-as-bowler"]], 64)
-		runsAsBatter, _ := strconv.Atoi(record[columnIndex["runs-as-batter"]])
-		runsAsBowler, _ := strconv.Atoi(record[columnIndex["runs-as-bowler"]])
-		wicketAsBowler, _ := strconv.Atoi(record[columnIndex["wicket-as-bowler"]])
+type MatchPlayerDataProcessor struct {
+	worker_pool.WorkerPool
+	*match.Match
+}
 
-		matchData := domain.MatchPlayerData{
-			MatchID:          record[columnIndex["match-id"]],
-			Team:             record[columnIndex["team"]],
-			Name:             record[columnIndex["name"]],
-			FoursAsBatter:    foursAsBatter,
-			SixesAsBatter:    sixesAsBatter,
-			BallsAsBatter:    ballsAsBatter,
-			DotBallsAsBowler: dotBallsAsBowler,
-			MatchName:        record[columnIndex["match-name"]],
-			MatchResult:      record[columnIndex["match-result"]],
-			NameWDTitles:     record[columnIndex["name-wd-titles"]],
-			OnFieldUmpires1:  record[columnIndex["on-field-umpires1"]],
-			OnFieldUmpires2:  record[columnIndex["on-field-umpires2"]],
-			OnFieldUmpires3:  record[columnIndex["on-field-umpires3"]],
-			OutDetails:       record[columnIndex["out-details"]],
-			OversAsBowler:    oversAsBowler,
-			PlayerRole:       record[columnIndex["player-role"]],
-			RunsAsBatter:     runsAsBatter,
-			RunsAsBowler:     runsAsBowler,
-			Venue:            record[columnIndex["venue"]],
-			WicketAsBowler:   wicketAsBowler,
-		}
+func NewMatchPlayerDataProcessor(ctx context.Context, matchPlayerData *player.MatchPlayer) *MatchPlayerDataProcessor {
+	adapter, err := worker_pool.NewWorkerPoolAdapter(
+		worker_pool.WithContext(ctx),
+		worker_pool.WithMaxWorkers(1),
+		worker_pool.WithMaxTasks(25),
+	)
+	if err != nil {
+		return nil
+	}
 
-		ch, ok := matchIdToChannel[matchData.MatchID]
+	return &MatchPlayerDataProcessor{
+		WorkerPool: adapter,
+		Match:      match.NewMatch(matchPlayerData),
+	}
+}
+
+func handleRecord(
+	ctx context.Context,
+	rwMx *sync.RWMutex,
+	matchIdToProcessor map[string]*MatchPlayerDataProcessor,
+) csvutils.RecordHandler {
+	return func(record interface{}) error {
+		matchPlayerData, ok := record.(*player.MatchPlayer)
 		if !ok {
-			ch = gr_variable.NewGrChannelWithLength[domain.MatchPlayerData](25)
-			matchIdToChannel[matchData.MatchID] = ch
+			return errors.New("invalid record type")
 		}
-		ch.WriteValue(matchData)
-		// You can now use matchData as needed, e.g., store it in a slice or process it further.
-		fmt.Println(matchData)
 
+		rwMx.RLock()
+		processor, ok := matchIdToProcessor[matchPlayerData.MatchID]
+		rwMx.RUnlock()
+		if !ok {
+			processor = NewMatchPlayerDataProcessor(ctx, matchPlayerData)
+			if processor == nil {
+				return fmt.Errorf("not able to init MatchPlayerDataProcessor")
+			}
+			rwMx.Lock()
+			matchIdToProcessor[matchPlayerData.MatchID] = processor
+			rwMx.Unlock()
+		}
+		processor.AddTask(processor.AddPlayer, matchPlayerData)
 		return nil
 	}
 }
 
+func printHandleRecord(record interface{}) error {
+	matchPlayerData, ok := record.(*player.MatchPlayer)
+	if !ok {
+		return errors.New("invalid record type")
+	}
+	fmt.Printf("----%#v\n", matchPlayerData)
+	fmt.Printf("--------%#v\n", matchPlayerData.PlayerStats)
+	fmt.Printf("------------%#v\n", matchPlayerData.PlayerStats.BattingStats)
+	fmt.Printf("------------%#v\n", matchPlayerData.PlayerStats.BowlingStats)
+	fmt.Printf("------------%#v\n", matchPlayerData.PlayerStats.FieldingStats)
+	return nil
+}
+
 func main() {
-	//ctx := context.Background()
-	matchIdToChannel := map[string]gr_variable.GrChannel[domain.MatchPlayerData]{}
-	if err := csv_reader.ReadCSV("data.csv", handleRecord(matchIdToChannel)); err != nil {
+	ctx := context.Background()
+	rwMx := sync.RWMutex{}
+	matchIdToProcessor := make(map[string]*MatchPlayerDataProcessor)
+
+	csvRecordHandler := csvutils.WithHandler(handleRecord(ctx, &rwMx, matchIdToProcessor))
+	//csvRecordHandler := csvutils.WithHandler(printHandleRecord)
+	if err := csvutils.ReadCSV("resource/data.csv", &player.MatchPlayer{}, csvRecordHandler); err != nil {
 		fmt.Println("Error:", err)
+	}
+
+	for _, processor := range matchIdToProcessor {
+		processor.AddTask(processor.UpdateScores)
+	}
+
+	for _, processor := range matchIdToProcessor {
+		processor.WaitAndStop()
+	}
+
+	for _, processor := range matchIdToProcessor {
+		//fmt.Printf("%-25s | %#v\n", "Name", "Score")
+		//fmt.Println("----------------------------------------")
+		//for name, mp := range processor.MatchPlayerMap {
+		//	fmt.Printf("%-25s | %5d\n", name, mp.PlayerStats.Score)
+		//}
+
+		mpSlice := make([]*player.MatchPlayer, 0)
+		for _, mp := range processor.MatchPlayerMap {
+			mpSlice = append(mpSlice, mp)
+		}
+
+		csvutils.WriteCSV("resource/final_output.csv", mpSlice)
 	}
 }

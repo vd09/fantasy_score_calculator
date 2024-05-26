@@ -7,12 +7,12 @@ import (
 func TestGetPlayerScore(t *testing.T) {
 	tests := []struct {
 		description   string
-		player        Player
+		player        PlayerStats
 		expectedScore int
 	}{
 		{
 			description: "Test player with only batting stats",
-			player: Player{
+			player: PlayerStats{
 				BattingStats: BattingStats{
 					Runs:        50,
 					TotalFours:  6,
@@ -24,7 +24,7 @@ func TestGetPlayerScore(t *testing.T) {
 		},
 		{
 			description: "Test player with only bowling stats",
-			player: Player{
+			player: PlayerStats{
 				BowlingStats: BowlingStats{
 					Runs:        25,
 					DotBalls:    20,
@@ -38,7 +38,7 @@ func TestGetPlayerScore(t *testing.T) {
 		},
 		{
 			description: "Test player with only fielding stats",
-			player: Player{
+			player: PlayerStats{
 				FieldingStats: FieldingStats{
 					Catches: 3,
 					Stumps:  1,
@@ -49,7 +49,7 @@ func TestGetPlayerScore(t *testing.T) {
 		},
 		{
 			description: "Test player with all stats",
-			player: Player{
+			player: PlayerStats{
 				BattingStats: BattingStats{
 					Runs:        60,
 					TotalFours:  8,

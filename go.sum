@@ -1,2 +1,8 @@
+github.com/vd09/csvutils v0.0.0-20240526190359-6356b9b4492e h1:DEeuJCFJlNobvx3tKrR4hTBd5eiJQiBtPO7BJuVZ8f8=
+github.com/vd09/csvutils v0.0.0-20240526190359-6356b9b4492e/go.mod h1:osD5R/OZCh+goke9HBVcN+wIk+pIDIHbEGpBIPk+cYY=
 github.com/vd09/gr-variable v0.0.0-20240505213543-579df24f059a h1:6uRDHw7tlxgIrx9VgvgYvCPywf9ibFqwCz7H/Jgjw50=
 github.com/vd09/gr-variable v0.0.0-20240505213543-579df24f059a/go.mod h1:g5yh9XmWgxRaT7YJC2BckAKrARBcIEkUSJPAPfAhMEo=
+github.com/vd09/gr_worker v0.0.0-20240510212127-3784db0ac98e h1:ryqOdS3KLbmjCaR0YE8ldROjri73gSyuTumyjIcAr48=
+github.com/vd09/gr_worker v0.0.0-20240510212127-3784db0ac98e/go.mod h1:KtnrqMas9T0/ELUOdfKeiRBQrtAUq3KeG9STBm+qrwo=
+github.com/vd09/gr_worker v0.0.0-20240519173909-7cbaf2e959fc h1:ADMHUKIhRqFQYTQfc5KUECa8hbYRImwZu/iXQY8jA+0=
+github.com/vd09/gr_worker v0.0.0-20240519173909-7cbaf2e959fc/go.mod h1:KtnrqMas9T0/ELUOdfKeiRBQrtAUq3KeG9STBm+qrwo=

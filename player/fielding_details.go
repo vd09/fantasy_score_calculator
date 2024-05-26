@@ -1,17 +1,17 @@
 package player
 
 type FieldingStats struct {
-	Catches        int
-	Stumps         int
-	DirectRunOut   int
-	IndirectRunOut int
+	Catches        int `csv:"catches"`
+	Stumps         int `csv:"stumps"`
+	DirectRunOut   int `csv:"direct_run_out"`
+	IndirectRunOut int `csv:"indirect_run_out"`
 }
 
-func (fs FieldingStats) GetFieldingScore() int {
+func (fs *FieldingStats) GetFieldingScore() int {
 	return fs.getCatchScore() + fs.getStumpingScore() + fs.getRunOutScore()
 }
 
-func (fs FieldingStats) getCatchScore() int {
+func (fs *FieldingStats) getCatchScore() int {
 	catchPoints := fs.Catches * CATCH_SCORE
 	if fs.Catches >= 3 {
 		catchPoints += BONUS_THREE_CATCH
@@ -19,10 +19,10 @@ func (fs FieldingStats) getCatchScore() int {
 	return catchPoints
 }
 
-func (fs FieldingStats) getStumpingScore() int {
+func (fs *FieldingStats) getStumpingScore() int {
 	return fs.Stumps * STUMP_SCORE
 }
 
-func (fs FieldingStats) getRunOutScore() int {
+func (fs *FieldingStats) getRunOutScore() int {
 	return (fs.DirectRunOut * RUNOUT_DIRECT_HIT) + (fs.IndirectRunOut * RUNOUT_INDIRECT_HIT)
 }

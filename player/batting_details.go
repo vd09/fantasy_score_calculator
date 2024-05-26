@@ -1,29 +1,29 @@
 package player
 
 type BattingStats struct {
-	Runs        int
-	TotalFours  int
-	TotalSixes  int
-	PlayedBalls int
-	OutDetails  string
+	Runs        int    `csv:"runs"`
+	TotalFours  int    `csv:"total_fours"`
+	TotalSixes  int    `csv:"total_sixes"`
+	PlayedBalls int    `csv:"played_balls"`
+	OutDetails  string `csv:"out_details"`
 }
 
-func (bt BattingStats) GetBattingScore() int {
+func (bt *BattingStats) GetBattingScore() int {
 	return bt.getRunScore() + bt.getBoundaryScore() + bt.getStrikeRateScore()
 }
 
-func (bt BattingStats) getRunScore() int {
+func (bt *BattingStats) getRunScore() int {
 	return bt.Runs + bt.getRunBonusScores()
 }
 
-func (bt BattingStats) getBoundaryScore() int {
+func (bt *BattingStats) getBoundaryScore() int {
 	var boundScore int
 	boundScore += bt.TotalFours * FOUR_BOUNDARY_BONUS
 	boundScore += bt.TotalSixes * SIX_BOUNDARY_BONUS
 	return boundScore
 }
 
-func (bt BattingStats) getRunBonusScores() int {
+func (bt *BattingStats) getRunBonusScores() int {
 	switch {
 	case bt.Runs >= 100:
 		return CENTURY_BONUS
@@ -38,7 +38,7 @@ func (bt BattingStats) getRunBonusScores() int {
 	}
 }
 
-func (bt BattingStats) getStrikeRateScore() int {
+func (bt *BattingStats) getStrikeRateScore() int {
 	if bt.PlayedBalls < 10 {
 		return 0
 	}
@@ -62,6 +62,6 @@ func (bt BattingStats) getStrikeRateScore() int {
 	}
 }
 
-func (bt BattingStats) isOut() bool {
+func (bt *BattingStats) isOut() bool {
 	return len(bt.OutDetails) != 0
 }

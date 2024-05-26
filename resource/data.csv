@@ -1,4 +1,4 @@
-match-id,team,name,4s-as-batter,6s-as-batter,balls-as-batter,dotballs-as-bowler,match-name,match-result,name-wd-titles,on-field-umpires1,on-field-umpires2,on-field-umpires3,out-details,overs-as-bowler,player-role,runs-as-batter,runs-as-bowler,venue,wicket-as-bowler
+match-id,player_team,player_name,player_batting_total_fours,player_batting_total_sixes,player_batting_played_balls,player_bowling_dot_balls,match-name,match-result,player_name_with_title,on-field-umpires1,on-field-umpires2,on-field-umpires3,player_batting_out_details,player_bowling_overs,player_role,player_batting_runs,player_bowling_runs,venue,player_bowling_wickets
 2008-Match_1,Kolkata Knight Riders,Ajit Agarkar,,,,15,Royal Challengers Bangalore VS Kolkata Knight Riders,,Ajit Agarkar,,,,,4,,,25,M. Chinnaswamy Stadium,3
 2008-Match_1,Kolkata Knight Riders,Ashok Dinda,,,,7,Royal Challengers Bangalore VS Kolkata Knight Riders,,Ashok Dinda,,,,,2,,,7,M. Chinnaswamy Stadium,1
 2008-Match_1,Kolkata Knight Riders,Brendon Mccullum,10,13,73,,Royal Challengers Bangalore VS Kolkata Knight Riders,,Brendon Mccullum,,,,not out,,,158,,M. Chinnaswamy Stadium,
@@ -10,7 +10,7 @@ match-id,team,name,4s-as-batter,6s-as-batter,balls-as-batter,dotballs-as-bowler,
 2008-Match_1,Kolkata Knight Riders,Ricky Ponting,1,1,20,,Royal Challengers Bangalore VS Kolkata Knight Riders,,Ricky Ponting,,,,c Praveen Kumar b Jacques Kallis,,,20,,M. Chinnaswamy Stadium,
 2008-Match_1,Kolkata Knight Riders,Sourav Ganguly,2,0,12,13,Royal Challengers Bangalore VS Kolkata Knight Riders,,Sourav Ganguly (captain),,,,c Jacques Kallis b Zaheer Khan,4,,10,21,M. Chinnaswamy Stadium,2
 2008-Match_1,Kolkata Knight Riders,Wriddhiman Saha,,,,,Royal Challengers Bangalore VS Kolkata Knight Riders,,Wriddhiman Saha,,,,,,,,,M. Chinnaswamy Stadium,
-2008-Match_1,Royal Challengers Bangalore,Ashley Noffke,1,0,10,7,Royal Challengers Bangalore VS Kolkata Knight Riders,,Ashley Noffke,,,,run out (Ajit Agarkar/wriddhiman Saha),4,,9,40,M. Chinnaswamy Stadium,1
+2008-Match_1,Royal Challengers Bangalore,Ashley Noffke,1,0,10,7,Royal Challengers Bangalore VS Kolkata Knight Riders,,Ashley Noffke,,,,run out (ajit   agarkar/wriddhiman Saha),4,,9,40,M. Chinnaswamy Stadium,1
 2008-Match_1,Royal Challengers Bangalore,Balachandra Akhil,0,0,2,,Royal Challengers Bangalore VS Kolkata Knight Riders,,Balachandra Akhil,,,,c Ricky Ponting b Ajit Agarkar,,,0,,M. Chinnaswamy Stadium,
 2008-Match_1,Royal Challengers Bangalore,Cameron White,0,0,10,0,Royal Challengers Bangalore VS Kolkata Knight Riders,,Cameron White,,,,c Wriddhiman Saha b Ajit Agarkar,1,,6,24,M. Chinnaswamy Stadium,0
 2008-Match_1,Royal Challengers Bangalore,Jacques Kallis,0,1,7,9,Royal Challengers Bangalore VS Kolkata Knight Riders,,Jacques Kallis,,,,c Murali Kartik b Ajit Agarkar,4,,8,48,M. Chinnaswamy Stadium,1
