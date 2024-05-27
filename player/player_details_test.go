@@ -7,13 +7,13 @@ import (
 func TestGetPlayerScore(t *testing.T) {
 	tests := []struct {
 		description   string
-		player        PlayerStats
+		player        *PlayerStats
 		expectedScore int
 	}{
 		{
 			description: "Test player with only batting stats",
-			player: PlayerStats{
-				BattingStats: BattingStats{
+			player: &PlayerStats{
+				BattingStats: &BattingStats{
 					Runs:        50,
 					TotalFours:  6,
 					TotalSixes:  2,
@@ -24,8 +24,8 @@ func TestGetPlayerScore(t *testing.T) {
 		},
 		{
 			description: "Test player with only bowling stats",
-			player: PlayerStats{
-				BowlingStats: BowlingStats{
+			player: &PlayerStats{
+				BowlingStats: &BowlingStats{
 					Runs:        25,
 					DotBalls:    20,
 					Wickets:     3,
@@ -38,25 +38,25 @@ func TestGetPlayerScore(t *testing.T) {
 		},
 		{
 			description: "Test player with only fielding stats",
-			player: PlayerStats{
-				FieldingStats: FieldingStats{
-					Catches: 3,
-					Stumps:  1,
-					runOut:  2,
+			player: &PlayerStats{
+				FieldingStats: &FieldingStats{
+					Catches:      3,
+					Stumps:       1,
+					DirectRunOut: 2,
 				},
 			},
 			expectedScore: (3 * CATCH_SCORE) + BONUS_THREE_CATCH + STUMP_SCORE + (2 * RUNOUT_DIRECT_HIT),
 		},
 		{
 			description: "Test player with all stats",
-			player: PlayerStats{
-				BattingStats: BattingStats{
+			player: &PlayerStats{
+				BattingStats: &BattingStats{
 					Runs:        60,
 					TotalFours:  8,
 					TotalSixes:  4,
 					PlayedBalls: 40,
 				},
-				BowlingStats: BowlingStats{
+				BowlingStats: &BowlingStats{
 					Runs:        35,
 					DotBalls:    15,
 					Wickets:     3,
@@ -64,10 +64,10 @@ func TestGetPlayerScore(t *testing.T) {
 					MaidenOvers: 1,
 					Overs:       5,
 				},
-				FieldingStats: FieldingStats{
-					Catches: 2,
-					Stumps:  1,
-					runOut:  1,
+				FieldingStats: &FieldingStats{
+					Catches:      2,
+					Stumps:       1,
+					DirectRunOut: 1,
 				},
 			},
 			expectedScore: (60 + (8 * FOUR_BOUNDARY_BONUS) + (4 * SIX_BOUNDARY_BONUS) + 8 + 2) + ((3 * WICKET_SCORE) + (THREE_WICKET_BONUS) + (2 * LBW_BONUS) + (1 * MAIDEN_OVER_SCORE) + 2) + ((2 * CATCH_SCORE) + STUMP_SCORE + RUNOUT_DIRECT_HIT),
@@ -76,9 +76,9 @@ func TestGetPlayerScore(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
-			score := test.player.GetPlayerScore()
-			if score != test.expectedScore {
-				t.Errorf("Expected score %d but got %d", test.expectedScore, score)
+			test.player.CalculatePlayerScore()
+			if test.player.Score != test.expectedScore {
+				t.Errorf("Expected score %d but got %d", test.expectedScore, test.player.Score)
 			}
 		})
 	}

@@ -32,12 +32,12 @@ func TestGetFieldingScore(t *testing.T) {
 		},
 		{
 			description:   "Test with 2 run outs",
-			fieldingStats: FieldingStats{runOut: 2},
+			fieldingStats: FieldingStats{DirectRunOut: 2},
 			expectedScore: 2 * RUNOUT_DIRECT_HIT,
 		},
 		{
 			description:   "Test with 2 run outs and 1 stumping",
-			fieldingStats: FieldingStats{runOut: 2, Stumps: 1},
+			fieldingStats: FieldingStats{DirectRunOut: 2, Stumps: 1},
 			expectedScore: 2*RUNOUT_DIRECT_HIT + 1*STUMP_SCORE,
 		},
 	}

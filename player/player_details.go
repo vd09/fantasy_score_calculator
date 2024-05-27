@@ -21,7 +21,14 @@ type PlayerStats struct {
 }
 
 func (py *PlayerStats) CalculatePlayerScore() {
-	py.Score = py.BattingStats.GetBattingScore() +
-		py.BowlingStats.GetBowlingScore() +
-		py.FieldingStats.GetFieldingScore()
+	py.Score = 0
+	if py.BattingStats != nil {
+		py.Score += py.BattingStats.GetBattingScore()
+	}
+	if py.BowlingStats != nil {
+		py.Score += py.BowlingStats.GetBowlingScore()
+	}
+	if py.FieldingStats != nil {
+		py.Score += py.FieldingStats.GetFieldingScore()
+	}
 }
